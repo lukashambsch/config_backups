@@ -1,8 +1,10 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
+set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
+:noremap <C-]> :YcmCompleter GoToDefinition<CR>
 call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
@@ -16,6 +18,13 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'klen/python-mode'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'pangloss/vim-javascript'
+Plugin 'othree/javascript-libraries-syntax.vim'
+Plugin 'burnettk/vim-angular'
+Plugin 'OmniSharp/omnisharp-vim'
+Plugin 'Raimondi/delimitMate'
+Plugin 'Valloric/YouCompleteMe'
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
 " plugin on GitHub repo
@@ -52,8 +61,13 @@ filetype plugin indent on    " required
 ""
 
 " Define paths
-let g:janus_path = escape(fnamemodify(resolve(expand("<sfile>:p")), ":h"), ' ')
-let g:janus_vim_path = escape(fnamemodify(resolve(expand("<sfile>:p" . "vim")), ":h"), ' ')
+if has('win32') || has('win64') || has('win32unix')
+  let g:janus_path = expand("~/.vim/janus/vim")
+  let g:janus_vim_path = expand("~/.vim/janus/vim")
+else
+  let g:janus_path = escape(fnamemodify(resolve(expand("<sfile>:p")), ":h"), ' ')
+  let g:janus_vim_path = escape(fnamemodify(resolve(expand("<sfile>:p" . "vim")), ":h"), ' ')
+endif
 let g:janus_custom_path = expand("~/.janus")
 
 " emmet config
@@ -80,6 +94,10 @@ let g:pymode_syntax_indent_errors = g:pymode_syntax_all
 let g:pymode_syntax_space_errors = g:pymode_syntax_all
 let g:pymode_folding = 0
 let g:pymode_options_max_line_length = 120
+
+" YouCompleteMe config
+let g:ycm_goto_buffer_command = "same-buffer"
+let g:ycm_min_num_of_chars_for_completion = 99
 
 " Source janus's core
 exe 'source ' . g:janus_vim_path . '/core/before/plugin/janus.vim'
@@ -108,5 +126,12 @@ exe 'source ' . g:janus_vim_path . '/core/plugins.vim'
 
 " Load all groups, custom dir, and janus core
 call janus#load_pathogen()
-colorscheme Molokai
+colorscheme molokai
+
 " .vimrc.after is loaded after the plugins have loaded
+fun! TrimWhitespace()
+  let l:save_cursor = getpos('.')
+  %s/\s\+$//e
+  call setpos('.', l:save_cursor)
+endfun
+autocmd BufWritePre * :call TrimWhitespace()
